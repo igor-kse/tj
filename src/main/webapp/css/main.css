@@ -1,0 +1,22 @@
+.index-actions {
+    font-size: large;
+}
+
+.meals-table {
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+.meals-table th,
+.meals-table td {
+    border: 2px solid black;
+    padding: 5px;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}

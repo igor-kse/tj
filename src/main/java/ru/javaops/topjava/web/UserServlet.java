@@ -10,11 +10,13 @@ import java.io.IOException;
 
 public class UserServlet extends HttpServlet {
 
+    protected static final String USERS_ACTION = "./jsp/users.jsp";
+
     private static final Logger log = LoggerFactory.getLogger(UserServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         log.info("Redirecting to {}", req.getRequestURI());
-        resp.sendRedirect("users.jsp"); // NOSONAR will be replaced by controllers
+        resp.sendRedirect(USERS_ACTION); // NOSONAR will be replaced by controllers
     }
 }

@@ -51,7 +51,7 @@ public class MealsUtil {
 
         var mealsTo = new ArrayList<MealTo>();
         for (Meal meal : meals) {
-            if (TimeUtil.isBetweenHalfOpen(meal.dateTime().toLocalTime(), startTime, endTime)) {
+            if (DateTimeUtil.isBetweenHalfOpen(meal.dateTime().toLocalTime(), startTime, endTime)) {
                 boolean excess = caloriesPerDays.get(meal.dateTime().toLocalDate()) > caloriesPerDay;
                 mealsTo.add(new MealTo(meal.dateTime(), meal.description(), meal.calories(), excess));
             }
@@ -64,7 +64,7 @@ public class MealsUtil {
                 .collect(Collectors.groupingBy(Meal::date, Collectors.summingInt(Meal::calories)));
 
         return meals.stream()
-                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.time(), startTime, endTime))
+                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.time(), startTime, endTime))
                 .map(meal -> MealMapper.map(meal, caloriesPerDays.get(meal.date()) > caloriesPerDay))
                 .toList();
     }
