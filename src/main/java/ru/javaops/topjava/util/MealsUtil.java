@@ -1,5 +1,7 @@
 package ru.javaops.topjava.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.javaops.topjava.mapper.MealMapper;
 import ru.javaops.topjava.model.Meal;
 import ru.javaops.topjava.dto.MealTo;
@@ -9,18 +11,18 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
 
-    private static final int CALORIES_PER_DAY = 2000;
-    private static final LocalTime startTime = LocalTime.of(7, 0);
-    private static final LocalTime endTime = LocalTime.of(12, 0);
+    public static final int CALORIES_PER_DAY = 2000;
 
-    private static final List<Meal> meals = Arrays.asList(
+    public static final LocalTime START_TIME = LocalTime.of(7, 0);
+    public static final LocalTime END_TIME = LocalTime.of(12, 0);
+
+    public static final List<Meal> meals = List.of(
             new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
             new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 13, 0), "Обед", 1000),
             new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -30,17 +32,17 @@ public class MealsUtil {
             new Meal(LocalDateTime.of(2025, Month.JANUARY, 31, 20, 0), "Ужин", 410)
     );
 
+    private static final Logger log = LoggerFactory.getLogger(MealsUtil.class);
+
     private MealsUtil() {
     }
 
     public static void main(String[] args) {
-        System.out.println("Cycle implementation:"); // NOSONAR
-        List<MealTo> mealsTo = filteredByCycles(meals, startTime, endTime, CALORIES_PER_DAY);
-        mealsTo.forEach(System.out::println); // NOSONAR
+        List<MealTo> mealsTo = filteredByCycles(meals, START_TIME, END_TIME, CALORIES_PER_DAY);
+        log.info("Cycle implementation: {}", mealsTo);
 
-        System.out.println("\nStream API implementation:"); // NOSONAR
-        mealsTo = filteredByStreams(meals, startTime, endTime, CALORIES_PER_DAY);
-        mealsTo.forEach(System.out::println); // NOSONAR
+        mealsTo = filteredByStreams(meals, START_TIME, END_TIME, CALORIES_PER_DAY);
+        log.info("Stream API implementation: {}", mealsTo);
     }
 
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
