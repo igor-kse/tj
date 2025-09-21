@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+
+<configuration scan="true" scanPeriod="30 seconds">
+    <jmxConfigurator/>
+
+    <import class="ch.qos.logback.core.FileAppender"/>
+    <import class="ch.qos.logback.core.ConsoleAppender"/>
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_ROOT}/topjava/topjava.log</file>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date %-5level %logger{0} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{HH:mm:ss.SSS} [%file:%line] %-5level %logger{36} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="ru.javaops.topjava" level="debug"/>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+</configuration>
