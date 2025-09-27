@@ -6,23 +6,93 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.javaops.topjava.mapper.MealMapper;
+import ru.javaops.topjava.model.Meal;
+import ru.javaops.topjava.repository.MapMealRepository;
+import ru.javaops.topjava.repository.MealRepository;
 import ru.javaops.topjava.util.MealsUtil;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+
+import static ru.javaops.topjava.util.MealsUtil.filteredByStreams;
+import static ru.javaops.topjava.util.MealsUtil.meals;
 
 public class MealServlet extends HttpServlet {
 
-    protected static final String MEALS_ACTION = "./jsp/meals.jsp";
+    protected static final String MEALS_LIST_ACTION = "/meals";
+    protected static final String MEALS_LIST_JSP = "./jsp/meals.jsp";
+    protected static final String MEAL_FORM_JSP = "./jsp/mealForm.jsp";
+
+    private static final String MEAL = "meal";
+    private static final String NOW = "now";
+    private static final String ID = "id";
+    private static final String DATE_TIME = "dateTime";
+    private static final String DESCRIPTION = "description";
+    private static final String CALORIES = "calories";
 
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var meals = MealsUtil.filteredByStreams(MealsUtil.meals, LocalTime.MIN, LocalTime.MAX, MealsUtil.CALORIES_PER_DAY);
-        req.setAttribute("meals", meals);
+    private static final MealRepository mealRepository;
 
-        log.info("Redirecting to {}", req.getRequestURI());
-        req.getRequestDispatcher(MEALS_ACTION).forward(req, resp); // NOSONAR will be replaced by controllers
+    static {
+        int seed = meals.size();
+        mealRepository = new MapMealRepository(seed);
+        MealsUtil.meals.forEach(mealRepository::save);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        switch (action) {
+            case "add" -> {
+                request.setAttribute(MEAL, null);
+                request.setAttribute(NOW, LocalDateTime.now());
+                log.info("Forwarding to new meal form");
+                request.getRequestDispatcher(MEAL_FORM_JSP).forward(request, response); // NOSONAR will be covered by exception handler
+            }
+            case "edit" -> {
+                int id = Integer.parseInt(request.getParameter("id")); // NOSONAR
+                log.info("Getting meal by id: {}", id);
+                var meal = mealRepository.findById(id);
+                request.setAttribute(MEAL, MealMapper.map(meal, false));
+                request.setAttribute(NOW, LocalDateTime.now());
+
+                log.info("Forwarding to edit meal form");
+                request.getRequestDispatcher(MEAL_FORM_JSP).forward(request, response); // NOSONAR
+            }
+            case "delete" -> {
+                int id = Integer.parseInt(request.getParameter(ID)); // NOSONAR
+                mealRepository.deleteById(id);
+                response.sendRedirect(request.getContextPath() + MEALS_LIST_ACTION);  // NOSONAR
+            }
+            case null -> {
+                log.info("Getting all meals");
+                var meals = filteredByStreams(mealRepository.getAll(), LocalTime.MIN, LocalTime.MAX, MealsUtil.CALORIES_PER_DAY);
+                request.setAttribute("meals", meals);
+
+                log.info("Redirecting to {}", request.getRequestURI());
+                request.getRequestDispatcher(MEALS_LIST_JSP).forward(request, response); // NOSONAR
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + action);  // NOSONAR
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String id =  request.getParameter(ID);
+        LocalDateTime dateTime = LocalDateTime.parse(request.getParameter(DATE_TIME));
+        String description = request.getParameter(DESCRIPTION);
+        int calories = Integer.parseInt(request.getParameter(CALORIES)); // NOSONAR
+
+        if (id != null && id.isBlank()) {
+            log.info("Saving meal by description: {}, datetime: {}, calories: {}", description, dateTime, calories);
+            mealRepository.save(new Meal(null, dateTime, description, calories));
+        } else if (id != null) {
+            log.info("Updating meal by id: {}, description: {}, datetime: {}, calories: {}", id, description, dateTime, calories);
+            mealRepository.save(new Meal(Integer.parseInt(id), dateTime, description, calories));
+        }
+        response.sendRedirect(request.getContextPath() + MEALS_LIST_ACTION);  // NOSONAR
     }
 }

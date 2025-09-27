@@ -23,13 +23,13 @@ public class MealsUtil {
     public static final LocalTime END_TIME = LocalTime.of(12, 0);
 
     public static final List<Meal> meals = List.of(
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 31, 13, 0), "Обед", 500),
-            new Meal(LocalDateTime.of(2025, Month.JANUARY, 31, 20, 0), "Ужин", 410)
+            new Meal(0, LocalDateTime.of(2025, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
+            new Meal(1, LocalDateTime.of(2025, Month.JANUARY, 30, 13, 0), "Обед", 1000),
+            new Meal(2, LocalDateTime.of(2025, Month.JANUARY, 30, 20, 0), "Ужин", 500),
+            new Meal(3, LocalDateTime.of(2025, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
+            new Meal(4, LocalDateTime.of(2025, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
+            new Meal(5, LocalDateTime.of(2025, Month.JANUARY, 31, 13, 0), "Обед", 500),
+            new Meal(6, LocalDateTime.of(2025, Month.JANUARY, 31, 20, 0), "Ужин", 410)
     );
 
     private static final Logger log = LoggerFactory.getLogger(MealsUtil.class);
@@ -47,13 +47,13 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         var caloriesPerDays = new HashMap<LocalDate, Integer>();
-        meals.forEach(meal -> caloriesPerDays.merge(meal.dateTime().toLocalDate(), meal.calories(), Integer::sum));
+        meals.forEach(meal -> caloriesPerDays.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
 
         var mealsTo = new ArrayList<MealTo>();
         for (Meal meal : meals) {
-            if (DateTimeUtil.isBetweenHalfOpen(meal.dateTime().toLocalTime(), startTime, endTime)) {
-                boolean excess = caloriesPerDays.get(meal.dateTime().toLocalDate()) > caloriesPerDay;
-                mealsTo.add(new MealTo(meal.dateTime(), meal.description(), meal.calories(), excess));
+            if (DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+                var mealTo = MealMapper.map(meal, caloriesPerDays.get(meal.getDateTime().toLocalDate()) > caloriesPerDay);
+                mealsTo.add(mealTo);
             }
         }
         return mealsTo;
@@ -61,11 +61,11 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         var caloriesPerDays = meals.stream()
-                .collect(Collectors.groupingBy(Meal::date, Collectors.summingInt(Meal::calories)));
+                .collect(Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories)));
 
         return meals.stream()
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.time(), startTime, endTime))
-                .map(meal -> MealMapper.map(meal, caloriesPerDays.get(meal.date()) > caloriesPerDay))
+                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
+                .map(meal -> MealMapper.map(meal, caloriesPerDays.get(meal.getDate()) > caloriesPerDay))
                 .toList();
     }
 }

@@ -9,6 +9,6 @@ public class MealMapper {
     }
 
     public static MealTo map(Meal meal, boolean excess) {
-        return new MealTo(meal.dateTime(), meal.description(), meal.calories(), excess);
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 }
