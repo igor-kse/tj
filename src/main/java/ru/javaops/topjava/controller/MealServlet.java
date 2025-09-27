@@ -1,4 +1,4 @@
-package ru.javaops.topjava.web;
+package ru.javaops.topjava.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,6 +11,7 @@ import ru.javaops.topjava.model.Meal;
 import ru.javaops.topjava.repository.MapMealRepository;
 import ru.javaops.topjava.repository.MealRepository;
 import ru.javaops.topjava.util.MealsUtil;
+import ru.javaops.topjava.util.SecurityUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static ru.javaops.topjava.util.MealsUtil.filteredByStreams;
-import static ru.javaops.topjava.util.MealsUtil.meals;
 
 public class MealServlet extends HttpServlet {
 
@@ -72,7 +72,7 @@ public class MealServlet extends HttpServlet {
 
     public void handleGetAllMeals(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.info("Getting all meals");
-        var meals = filteredByStreams(mealRepository.getAll(), LocalTime.MIN, LocalTime.MAX, MealsUtil.DEFAULT_CALORIES_PER_DAY);
+        var meals = filteredByStreams(mealRepository.getAll(), LocalTime.MIN, LocalTime.MAX, SecurityUtil.authUserCaloriesPerDay());
         request.setAttribute("meals", meals);
 
         log.info("Redirecting to {}", request.getRequestURI());

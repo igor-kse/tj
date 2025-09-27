@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 public class MealsUtil {
 
-    public static final int DEFAULT_CALORIES_PER_DAY = 2000;
-
     public static final LocalTime START_TIME = LocalTime.of(7, 0);
     public static final LocalTime END_TIME = LocalTime.of(12, 0);
 
@@ -62,10 +60,10 @@ public class MealsUtil {
     }
 
     public static void main(String[] args) {
-        List<MealTo> mealsTo = filteredByCycles(meals, START_TIME, END_TIME, DEFAULT_CALORIES_PER_DAY);
+        List<MealTo> mealsTo = filteredByCycles(meals, START_TIME, END_TIME, SecurityUtil.authUserCaloriesPerDay());
         log.info("Cycle implementation: {}", mealsTo);
 
-        mealsTo = filteredByStreams(meals, START_TIME, END_TIME, DEFAULT_CALORIES_PER_DAY);
+        mealsTo = filteredByStreams(meals, START_TIME, END_TIME, SecurityUtil.authUserCaloriesPerDay());
         log.info("Stream API implementation: {}", mealsTo);
     }
 }

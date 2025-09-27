@@ -1,4 +1,4 @@
-package ru.javaops.topjava.web;
+package ru.javaops.topjava.controller;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
