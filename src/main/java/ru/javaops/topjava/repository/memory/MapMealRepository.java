@@ -1,6 +1,7 @@
-package ru.javaops.topjava.repository;
+package ru.javaops.topjava.repository.memory;
 
 import ru.javaops.topjava.model.Meal;
+import ru.javaops.topjava.repository.MealRepository;
 import ru.javaops.topjava.util.Utils;
 
 import java.util.Comparator;

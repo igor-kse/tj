@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 public class MealsUtil {
 
+    public static final int DEFAULT_CALORIES_PER_DAY = 2000;
     public static final LocalTime START_TIME = LocalTime.of(7, 0);
     public static final LocalTime END_TIME = LocalTime.of(12, 0);
 

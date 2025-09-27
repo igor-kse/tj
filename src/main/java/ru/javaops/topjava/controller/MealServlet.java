@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.javaops.topjava.mapper.MealMapper;
 import ru.javaops.topjava.model.Meal;
-import ru.javaops.topjava.repository.MapMealRepository;
+import ru.javaops.topjava.repository.memory.MapMealRepository;
 import ru.javaops.topjava.repository.MealRepository;
 import ru.javaops.topjava.util.MealsUtil;
 import ru.javaops.topjava.util.SecurityUtil;

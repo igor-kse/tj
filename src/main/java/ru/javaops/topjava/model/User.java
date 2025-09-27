@@ -1,7 +1,9 @@
 package ru.javaops.topjava.model;
 
-import java.util.Date;
-import java.util.Set;
+import org.springframework.util.CollectionUtils;
+import ru.javaops.topjava.util.MealsUtil;
+
+import java.util.*;
 
 public class User extends BaseNamedEntity {
 
@@ -11,30 +13,38 @@ public class User extends BaseNamedEntity {
 
     private boolean enabled;
 
-    private Date registrationDate;
+    private Date registrationDate = new Date();
 
     private Set<Role> roles;
 
     private int caloriesPerDay;
 
-    public User(Long id, String name, String email, String password, boolean enabled, Date registrationDate, Set<Role> roles, int caloriesPerDay) {
-        super(id, name);
+    public User(String name, String email, String password, boolean enabled, Role... roles) {
+        super(null, name);
+        this.caloriesPerDay = MealsUtil.DEFAULT_CALORIES_PER_DAY;
         this.email = email;
         this.password = password;
         this.enabled = enabled;
-        this.registrationDate = registrationDate;
-        this.roles = roles;
-        this.caloriesPerDay = caloriesPerDay;
+        setRoles(Arrays.asList(roles));
     }
 
-    public User(String name, String email, String password, int caloriesPerDay, boolean enabled, Set<Role> roles, Date registrationDate) {
+    public User(String name,int caloriesPerDay, String email, String password, boolean enabled, Role... roles) {
         super(null, name);
+        this.caloriesPerDay = caloriesPerDay;
         this.email = email;
         this.password = password;
         this.enabled = enabled;
-        this.registrationDate = registrationDate;
-        this.roles = roles;
+        setRoles(Arrays.asList(roles));
+    }
+
+    public User(Long id, String name, int caloriesPerDay, String email, String password, boolean enabled, Date registrationDate, Role... roles) {
+        super(id, name);
+        this.email = email;
         this.caloriesPerDay = caloriesPerDay;
+        this.password = password;
+        this.enabled = enabled;
+        this.registrationDate = registrationDate;
+        setRoles(Arrays.asList(roles));
     }
 
     public String getEmail() {
@@ -73,8 +83,8 @@ public class User extends BaseNamedEntity {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRoles(Collection<Role> roles) {
+        this.roles = CollectionUtils.isEmpty(roles) ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(roles);
     }
 
     public int getCaloriesPerDay() {
