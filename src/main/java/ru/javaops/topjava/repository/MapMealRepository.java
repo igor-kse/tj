@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class MapMealRepository implements MealRepository {
@@ -18,14 +19,6 @@ public class MapMealRepository implements MealRepository {
 
     private static final Map<Integer, Meal> mealStorage = new ConcurrentHashMap<>();
     private static final AtomicInteger counter = new AtomicInteger(0);
-
-    public MapMealRepository() {
-    }
-
-    public MapMealRepository(int seed) {
-        counter.set(seed);
-    }
-
 
     @Override
     public void save(Meal meal) {
@@ -43,8 +36,10 @@ public class MapMealRepository implements MealRepository {
         Utils.assureNotNull(meal, MEAL_NOT_NULL_MESSAGE);
         Utils.assureNotNull(meal.getId(), ID_NOT_NULL_MESSAGE);
 
-        var success = mealStorage.replace(meal.getId(), meal);
-        return success != null;
+        BiFunction<Integer, Meal, Meal> updateFunction = (id, existing) ->
+                new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories());
+
+        return mealStorage.computeIfPresent(meal.getId(), updateFunction) != null;
     }
 
     @Override

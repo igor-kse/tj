@@ -7,6 +7,8 @@
     <import class="ch.qos.logback.core.FileAppender"/>
     <import class="ch.qos.logback.core.ConsoleAppender"/>
 
+    <property name="LOG_ROOT" value="${LOG_ROOT:-/var/log/topjava}"/>
+
     <appender name="file" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_ROOT}/topjava/topjava.log</file>
 
