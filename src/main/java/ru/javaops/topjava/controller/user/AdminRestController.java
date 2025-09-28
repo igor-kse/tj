@@ -1,10 +1,12 @@
 package ru.javaops.topjava.controller.user;
 
+import org.springframework.stereotype.Controller;
 import ru.javaops.topjava.model.User;
 import ru.javaops.topjava.service.UserService;
 
 import java.util.List;
 
+@Controller
 public class AdminRestController extends BaseUserController {
 
     public AdminRestController(UserService userService) {

@@ -2,16 +2,18 @@ package ru.javaops.topjava.controller.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.javaops.topjava.model.User;
 import ru.javaops.topjava.service.UserService;
 import ru.javaops.topjava.util.ValidationUtil;
 
 import java.util.List;
 
-public class BaseUserController {
+public abstract class BaseUserController {
 
     private final Logger log = LoggerFactory.getLogger(BaseUserController.class);
 
+    @Autowired
     public UserService userService;
 
     public BaseUserController(UserService userService) {

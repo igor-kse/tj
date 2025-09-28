@@ -1,11 +1,13 @@
 package ru.javaops.topjava.service;
 
+import org.springframework.stereotype.Service;
 import ru.javaops.topjava.model.User;
 import ru.javaops.topjava.repository.UserRepository;
 import ru.javaops.topjava.util.ValidationUtil;
 
 import java.util.List;
 
+@Service
 public class UserService {
 
     private static final String USER_WITH_ID_NOT_FOUND = "User not found: id = %d";
