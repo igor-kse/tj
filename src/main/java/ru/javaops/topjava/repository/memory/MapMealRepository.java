@@ -1,60 +1,82 @@
 package ru.javaops.topjava.repository.memory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import ru.javaops.topjava.model.Meal;
 import ru.javaops.topjava.repository.MealRepository;
-import ru.javaops.topjava.util.Utils;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class MapMealRepository implements MealRepository {
 
-    private static final String MEAL_NOT_NULL_MESSAGE = "Meal cannot be null";
-    private static final String ID_NOT_NULL_MESSAGE = "id cannot be null";
+    private static final Map<Long, Map<Long, Meal>> mealStorage = new ConcurrentHashMap<>();
+    private static final AtomicLong lastId = new AtomicLong(0);
 
-    private static final Map<Integer, Meal> mealStorage = new ConcurrentHashMap<>();
-    private static final AtomicInteger counter = new AtomicInteger(0);
+    private static final Logger log = LoggerFactory.getLogger(MapMealRepository.class);
+
+    private static final Comparator<Meal> MEAL_DATETIME_DESC = Comparator.comparing(Meal::getDateTime).reversed();
 
     @Override
-    public void save(Meal meal) {
-        Utils.assureNotNull(meal, MEAL_NOT_NULL_MESSAGE);
-
-        Integer id = meal.getId();
-        if (id == null) {
-            id = counter.incrementAndGet();
+    public Meal save(Meal meal, long ownerId) {
+        log.info("Saving meal: {}", meal);
+        var meals = mealStorage.computeIfAbsent(ownerId, id -> new ConcurrentHashMap<>());
+        if (meal.isNew()) {
+            meal.setId(lastId.incrementAndGet());
+            meals.put(meal.getId(), meal);
+            return meal;
         }
-        mealStorage.put(id, new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories()));
+        return meals.computeIfPresent(meal.getId(), (id, meal1) -> meal);
     }
 
     @Override
-    public boolean update(Meal meal) {
-        Utils.assureNotNull(meal, MEAL_NOT_NULL_MESSAGE);
-        Utils.assureNotNull(meal.getId(), ID_NOT_NULL_MESSAGE);
-
-        BiFunction<Integer, Meal, Meal> updateFunction = (id, existing) ->
-                new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories());
-
-        return mealStorage.computeIfPresent(meal.getId(), updateFunction) != null;
+    public Meal find(long id, long ownerId) {
+        log.info("Getting meal by id: {} for owner {}", id, ownerId);
+        var meals = mealStorage.get(ownerId);
+        return meals == null ? null : meals.get(id);
     }
 
     @Override
-    public Meal findById(int id) {
-        return mealStorage.get(id);
+    public boolean delete(long id, long ownerId) {
+        log.info("Deleting meal by id: {}; for owner: {}", id, ownerId);
+        var meals = mealStorage.get(ownerId);
+        return meals != null && meals.remove(id) != null;
     }
 
     @Override
-    public void deleteById(int id) {
-        mealStorage.remove(id);
+    public List<Meal> getAll(long ownerId) {
+        log.info("Getting all meals of owner: {}", ownerId);
+        var meals = mealStorage.get(ownerId);
+        return meals == null || meals.isEmpty()
+                ? Collections.emptyList()
+                : meals.values().stream().sorted(Comparator.comparing(Meal::getDateTime).reversed()).toList();
     }
 
-    @Override
-    public List<Meal> getAll() {
-        return mealStorage.values().stream()
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+    public List<Meal> getBetweenHalfOpen(long ownerId, LocalDateTime start, LocalDateTime end) {
+        var dtStart = (start == null) ? LocalDateTime.MIN : start;
+        var dtEnd = (start == null) ? LocalDateTime.MAX : end;
+
+        log.debug("Getting all meals between {} and {} for owner {}", dtStart, dtEnd, ownerId);
+
+        if (!dtStart.isBefore(dtEnd)) {
+            return List.of();
+        }
+
+        var meals = mealStorage.get(ownerId);
+        if (meals == null || meals.isEmpty()) {
+            return List.of();
+        }
+
+        return meals.values().stream()
+                .filter(meal -> {
+                    var dt = meal.getDateTime();
+                    return (!dt.isBefore(dtStart) && dt.isBefore(dtEnd));
+                })
+                .sorted(MEAL_DATETIME_DESC)
                 .toList();
     }
 }

@@ -2,17 +2,18 @@ package ru.javaops.topjava.repository;
 
 import ru.javaops.topjava.model.Meal;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MealRepository {
 
-    void save(Meal meal);
+    Meal save(Meal meal, long ownerId);
 
-    Meal findById(int id);
+    Meal find(long id, long ownerId);
 
-    void deleteById(int id);
+    boolean delete(long id, long ownerId);
 
-    boolean update(Meal meal);
+    List<Meal> getAll(long ownerId);
 
-    List<Meal> getAll();
+    List<Meal> getBetweenHalfOpen(long ownerId, LocalDateTime start, LocalDateTime end);
 }

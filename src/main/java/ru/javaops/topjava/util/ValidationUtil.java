@@ -35,4 +35,10 @@ public class ValidationUtil {
             throw new IllegalArgumentException(String.format(ENTITY_MUST_BE_WITH_ANOTHER_ID, entity, id));
         }
     }
+
+    public static void assureNotNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

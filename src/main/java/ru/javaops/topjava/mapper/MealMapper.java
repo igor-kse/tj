@@ -1,7 +1,11 @@
 package ru.javaops.topjava.mapper;
 
 import ru.javaops.topjava.model.Meal;
-import ru.javaops.topjava.dto.MealTo;
+import ru.javaops.topjava.to.MealTo;
+import ru.javaops.topjava.util.MealsUtil;
+
+import java.time.LocalTime;
+import java.util.List;
 
 public class MealMapper {
 

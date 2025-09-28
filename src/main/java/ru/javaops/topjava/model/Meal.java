@@ -5,24 +5,42 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
-public final class Meal {
-    private final Integer id;
-    private final LocalDateTime dateTime;
-    private final String description;
-    private final int calories;
+public final class Meal extends BaseEntity{
+    private LocalDateTime dateTime;
+    private String description;
+    private int calories;
+    private Long userId;
 
-    public Meal(LocalDateTime dateTime, String description, int calories) {
-        this.id = null;
+    public Meal(LocalDateTime dateTime, String description, int calories, Long userId) {
+        super(null);
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
+        this.userId = userId;
     }
 
-    public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
-        this.id = id;
+    public Meal(Long id, LocalDateTime dateTime, String description, int calories, Long userId) {
+        super(id);
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
+        this.userId = userId;
+    }
+
+    public Meal(Meal meal) {
+        super(meal.getId());
+        this.dateTime = meal.getDateTime();
+        this.description = meal.getDescription();
+        this.calories = meal.getCalories();
+        this.userId = meal.getUserId();
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public LocalDate getDate() {
@@ -33,20 +51,28 @@ public final class Meal {
         return dateTime.toLocalTime();
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public int getCalories() {
         return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     @Override

@@ -22,7 +22,7 @@
         <th></th>
         <th></th>
     </tr>
-    <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javaops.topjava.dto.MealTo>"/>
+    <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javaops.topjava.to.MealTo>"/>
     <c:forEach var="meal" items="${meals}">
         <tr>
             <td class="${meal.excess() ? 'red' : 'green'}">${d:format(meal.dateTime(), "dd.MM.yyyy HH:mm")}</td>

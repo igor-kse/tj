@@ -2,12 +2,11 @@ package ru.javaops.topjava.util;
 
 public class SecurityUtil {
 
-    // FIXME For development only
-    private static final int TEMPORARY_USER_ID = 1;
+    private static final long TEMPORARY_USER_ID = 0;
 
     private SecurityUtil() {}
 
-    public static Integer authUserId() {
+    public static Long authUserId() {
         return TEMPORARY_USER_ID;
     }
 
